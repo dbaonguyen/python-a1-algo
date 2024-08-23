@@ -12,111 +12,152 @@ from maze.util import Coordinates
 from maze.graph import Graph
 
 
-class EdgeListGraph(Graph):
+from typing import List, Tuple, Set
+from maze.util import Coordinates
+
+class EdgeListGraph:
     """
-    Represents an undirected graph.  Please complete the implementations of each method.  See the documentation for the parent class
-    to see what each of the overriden methods are meant to do.
+    Represents an undirected graph using an edge list. Each edge is stored as a tuple containing two vertices
+    and a boolean indicating the presence of a wall between them.
     """
 
     def __init__(self):
-        ### Implement me! ###
+        """
+        Initializes the graph with an empty list of edges and an empty set of vertices.
+        - self.edges: A list of tuples, where each tuple is of the form (vertex1, vertex2, hasWall).
+        - self.vertices: A set of unique vertices (nodes) in the graph.
+        """
         self.edges: List[Tuple[Coordinates, Coordinates, bool]] = []
-        self.vertices: set[Coordinates] = set()
-        
-    
+        self.vertices: Set[Coordinates] = set()
 
-
+    def addVertex(self, label: Coordinates):
+        """
+        Adds a vertex to the graph if it does not already exist.
         
-    def addVertex(self, label:Coordinates):
-        ### Implement me! ###
+        Parameters:
+        - label: The coordinate of the vertex to be added.
+        """
         if label not in self.vertices:
             self.vertices.add(label)
-        
 
+    def addVertices(self, vertLabels: List[Coordinates]):
+        """
+        Adds multiple vertices to the graph by calling the addVertex method for each label in the list.
 
-
-    def addVertices(self, vertLabels:List[Coordinates]):
-        ### Implement me! ###
+        Parameters:
+        - vertLabels: A list of coordinates representing the vertices to be added.
+        """
         for label in vertLabels:
             self.addVertex(label)
+
+    def addEdge(self, vert1: Coordinates, vert2: Coordinates, addWall: bool = False) -> bool:
+        """
+        Adds an edge between two vertices if both vertices exist in the graph and the edge does not already exist.
+        The edge is represented as a tuple of the form (vertex1, vertex2, hasWall).
         
+        Parameters:
+        - vert1: The first vertex in the edge.
+        - vert2: The second vertex in the edge.
+        - addWall: A boolean indicating whether there is a wall between the vertices.
 
-
-
-    def addEdge(self, vert1:Coordinates, vert2:Coordinates, addWall:bool = False)->bool:
-        ### Implement me! ###
+        Returns:
+        - True if the edge was successfully added, False otherwise.
+        """
         if vert1 in self.vertices and vert2 in self.vertices:
             if (vert1, vert2, addWall) not in self.edges:
                 self.edges.append((vert1, vert2, addWall))
                 return True
-            
         return False
-        # remember to return booleans
-        
-        
 
+    def updateWall(self, vert1: Coordinates, vert2: Coordinates, wallStatus: bool) -> bool:
+        """
+        Updates the wall status of an existing edge between two vertices. If the edge exists, the wall status is updated.
+        
+        Parameters:
+        - vert1: The first vertex in the edge.
+        - vert2: The second vertex in the edge.
+        - wallStatus: A boolean indicating the new wall status.
 
-    def updateWall(self, vert1:Coordinates, vert2:Coordinates, wallStatus:bool)->bool:
-        ### Implement me! ###
+        Returns:
+        - True if the wall status was successfully updated, False otherwise.
+        """
         for i, (v1, v2, _) in enumerate(self.edges):
             if (v1 == vert1 and v2 == vert2) or (v1 == vert2 and v2 == vert1):
                 self.edges[i] = (v1, v2, wallStatus)
                 return True
-            
         return False
-        
-        # remember to return booleans
-        
-        
 
+    def removeEdge(self, vert1: Coordinates, vert2: Coordinates) -> bool:
+        """
+        Removes an edge between two vertices if it exists in the graph.
+        
+        Parameters:
+        - vert1: The first vertex in the edge.
+        - vert2: The second vertex in the edge.
 
-
-    def removeEdge(self, vert1:Coordinates, vert2:Coordinates)->bool:
-        ### Implement me! ###
+        Returns:
+        - True if the edge was successfully removed, False otherwise.
+        """
         for edge in self.edges:
             if (edge[0] == vert1 and edge[1] == vert2) or (edge[0] == vert2 and edge[1] == vert1):
                 self.edges.remove(edge)
                 return True
         return False
-        
-        # remember to return booleans
-        
-        
 
+    def hasVertex(self, label: Coordinates) -> bool:
+        """
+        Checks if a vertex exists in the graph.
 
-    def hasVertex(self, label:Coordinates)->bool:
-        ### Implement me! ###
+        Parameters:
+        - label: The coordinate of the vertex to check.
+
+        Returns:
+        - True if the vertex exists, False otherwise.
+        """
         return label in self.vertices
-        # remember to return booleans
+
+    def hasEdge(self, vert1: Coordinates, vert2: Coordinates) -> bool:
+        """
+        Checks if an edge exists between two vertices in the graph.
         
+        Parameters:
+        - vert1: The first vertex in the edge.
+        - vert2: The second vertex in the edge.
 
-
-
-    def hasEdge(self, vert1:Coordinates, vert2:Coordinates)->bool:
-        ### Implement me! ###
+        Returns:
+        - True if the edge exists, False otherwise.
+        """
         for v1, v2, _ in self.edges:
             if (v1 == vert1 and v2 == vert2) or (v1 == vert2 and v2 == vert1):
                 return True
         return False
-        # remember to return booleans
+
+    def getWallStatus(self, vert1: Coordinates, vert2: Coordinates) -> bool:
+        """
+        Retrieves the wall status between two vertices in the graph.
         
+        Parameters:
+        - vert1: The first vertex in the edge.
+        - vert2: The second vertex in the edge.
 
-
-
-    def getWallStatus(self, vert1:Coordinates, vert2:Coordinates)->bool:
-        ### Implement me! ###
+        Returns:
+        - True if there is a wall between the vertices, False otherwise.
+        """
         for v1, v2, wall in self.edges:
             if (v1 == vert1 and v2 == vert2) or (v1 == vert2 and v2 == vert1):
                 return wall
         return False
-        # remember to return booleans
-        
-        
-    
 
+    def neighbours(self, label: Coordinates) -> List[Coordinates]:
+        """
+        Finds all neighbors of a given vertex in the graph.
+        
+        Parameters:
+        - label: The coordinate of the vertex whose neighbors are to be found.
 
-    def neighbours(self, label:Coordinates)->List[Coordinates]:
-        ### Implement me! ###
+        Returns:
+        - A list of coordinates representing the neighbors of the vertex.
+        """
         neighbours = []
         for v1, v2, _ in self.edges:
             if v1 == label:
@@ -124,6 +165,3 @@ class EdgeListGraph(Graph):
             elif v2 == label:
                 neighbours.append(v1)
         return neighbours
-        # remember to return list of coordinates
-        
-        
